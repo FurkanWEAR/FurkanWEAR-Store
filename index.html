@@ -1,1 +1,155 @@
 
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOID — Streetwear</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f5f4f0;color:#171717;font-family:Arial,Helvetica,sans-serif}
+header{height:76px;padding:0 6%;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ddd}
+.logo{font-size:27px;font-weight:900;letter-spacing:4px}
+nav{display:flex;gap:25px}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+.cart{background:#171717;color:white;border:0;padding:12px 18px}
+.hero{background:#171717;color:white;padding:85px 8% 75px;min-height:390px;display:flex;flex-direction:column;justify-content:center}
+.tag{font-size:11px;letter-spacing:4px;color:#aaa}
+h1{font-size:clamp(48px,9vw,100px);line-height:.94;letter-spacing:-5px;margin:24px 0}
+.hero p{color:#bbb;line-height:1.7}
+.cta{background:white;color:#171717;padding:15px 22px;border:0;font-weight:bold;width:max-content;margin-top:16px}
+.section{padding:55px 6%}
+.section-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+h2{font-size:30px;letter-spacing:-1px}
+.products{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.product{min-width:0}
+.photo{aspect-ratio:3/4;background:#e4e2dc;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.photo img{width:100%;height:100%;object-fit:cover}
+.number{position:absolute;top:12px;left:12px;background:white;padding:7px 10px;font-size:11px}
+.product h3{font-size:15px;margin:14px 0 7px}
+.price{font-weight:bold}
+.product select{width:100%;padding:12px;margin-top:13px;background:transparent;border:1px solid #bbb}
+.add{margin-top:8px;width:100%;padding:13px;background:#171717;color:white;border:0}
+.add:hover,.cart:hover{background:#444}
+.about{background:#e7e5df;padding:45px 8%;line-height:1.8}
+footer{background:#171717;color:white;padding:35px 6%;font-size:13px;line-height:1.8}
+#notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#171717;color:white;padding:14px 20px;display:none;max-width:90%;z-index:5}
+#cartPanel{display:none;position:fixed;inset:0;background:#0008;z-index:10;justify-content:flex-end}
+.panel{background:#fff;width:min(420px,100%);height:100%;padding:25px;overflow:auto}
+.panel-head{display:flex;justify-content:space-between;align-items:center}
+.cart-line{border-bottom:1px solid #ddd;padding:15px 0;display:flex;justify-content:space-between;gap:12px}
+.close{border:0;background:transparent;font-size:24px}
+.checkout{background:#171717;color:white;border:0;padding:15px;width:100%;margin-top:18px}
+@media(max-width:650px){
+ header{padding:0 5%;height:65px}nav{display:none}
+ .hero{padding:65px 6%;min-height:360px}h1{letter-spacing:-3px}
+ .section{padding:35px 5%}.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ h2{font-size:24px}.product h3{font-size:14px}
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="#">VOID.</a>
+  <nav><a href="#shop">Koleksiyon</a><a href="#about">Hakkımızda</a></nav>
+  <button class="cart" onclick="openCart()">SEPET (<span id="count">0</span>)</button>
+</header>
+
+<main>
+<section class="hero">
+  <div class="tag">STREETWEAR / NEW GENERATION</div>
+  <h1>WEAR YOUR<br>OWN RULES.</h1>
+  <p>Standartların dışına çık. Tarzını kendin belirle.<br>Yeni nesil oversize koleksiyonunu keşfet.</p>
+  <button class="cta" onclick="document.querySelector('#shop').scrollIntoView({behavior:'smooth'})">KOLEKSİYONU KEŞFET ↘</button>
+</section>
+
+<section class="section" id="shop">
+  <div class="section-top">
+    <div><div class="tag" style="color:#777">01 / THE COLLECTION</div><h2>ÖNE ÇIKAN ÜRÜNLER</h2></div>
+    <span style="font-size:12px;color:#777">DROP 001</span>
+  </div>
+  <div class="products" id="products"></div>
+</section>
+
+<section class="about" id="about">
+  <div class="tag" style="color:#777">OUR PHILOSOPHY</div>
+  <h2>FARKLI OLMAKTAN<br>ÇEKİNME.</h2>
+  <p>VOID, sokak kültüründen ve özgür ifadeden ilham alan bir streetwear konseptidir. Kendi kurallarını koy. Kendi tarzını yarat.</p>
+</section>
+</main>
+
+<footer>
+  <div class="logo">VOID.</div>
+  <p>STREETWEAR FOR EVERYDAY REBELS.</p>
+  <p>© 2026 VOID. Demo mağaza tasarımı.</p>
+</footer>
+
+<div id="notice"></div>
+<div id="cartPanel" onclick="if(event.target===this)closeCart()">
+  <div class="panel">
+    <div class="panel-head"><h2>SEPETİN</h2><button class="close" onclick="closeCart()">×</button></div>
+    <div id="cartItems"></div>
+    <h3 id="total">Toplam: ₺0</h3>
+    <button class="checkout" onclick="checkout()">SİPARİŞ İÇİN İLETİŞİME GEÇ</button>
+    <p style="font-size:12px;color:#777">Bu demo sürümünde gerçek ödeme alınmaz.</p>
+  </div>
+</div>
+
+<script>
+const products=[
+ {id:1,name:"Essential Oversize Tee",price:499,color:"#d9d7d0",type:"T-SHIRT",image:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80"},
+ {id:2,name:"Urban Heavy Hoodie",price:1099,color:"#d5d2cb",type:"HOODIE",image:"https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=700&q=80"},
+ {id:3,name:"Street Fit Tee",price:549,color:"#d9d7d0",type:"NEW DROP",image:"https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=700&q=80"},
+ {id:4,name:"Daily Oversize",price:599,color:"#d9d7d0",type:"ESSENTIALS",image:"https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=700&q=80"},
+ {id:5,name:"Classic Street Hoodie",price:1199,color:"#d5d2cb",type:"HOODIE",image:"https://images.unsplash.com/photo-1578681994506-b8f463449011?auto=format&fit=crop&w=700&q=80"},
+ {id:6,name:"Relaxed Streetwear",price:649,color:"#d9d7d0",type:"LIMITED",image:"https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=700&q=80"}
+];
+let cart=[];
+const money=n=>n.toLocaleString("tr-TR")+" TL";
+document.getElementById("products").innerHTML=products.map(p=>`
+ <article class="product">
+  <div class="photo" style="background:${p.color}">
+   <span class="number">${p.type}</span>
+   <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.style.display='none'">
+  </div>
+  <h3>${p.name}</h3>
+  <div class="price">${money(p.price)}</div>
+  <select id="size-${p.id}" aria-label="${p.name} beden seçimi">
+   <option value="">Beden seç</option><option>S</option><option>M</option><option>L</option><option>XL</option>
+  </select>
+  <button class="add" onclick="addToCart(${p.id})">SEPETE EKLE +</button>
+ </article>`).join("");
+function addToCart(id){
+ const size=document.getElementById("size-"+id).value;
+ if(!size){notify("Lütfen önce beden seç.");return}
+ const p=products.find(x=>x.id===id);
+ cart.push({...p,size});
+ updateCart();notify("Ürün sepete eklendi.");
+}
+function updateCart(){
+ document.getElementById("count").textContent=cart.length;
+ document.getElementById("cartItems").innerHTML=cart.length?cart.map((p,i)=>`
+ <div class="cart-line"><div><b>${p.name}</b><br><small>Beden: ${p.size}</small><br>${money(p.price)}</div>
+ <button onclick="removeItem(${i})" aria-label="Ürünü kaldır">Sil</button></div>`).join(""):"Sepetin şu an boş.";
+ document.getElementById("total").textContent="Toplam: "+money(cart.reduce((s,p)=>s+p.price,0));
+}
+function removeItem(i){cart.splice(i,1);updateCart()}
+function openCart(){document.getElementById("cartPanel").style.display="flex";updateCart()}
+function closeCart(){document.getElementById("cartPanel").style.display="none"}
+function notify(t){
+ const n=document.getElementById("notice");n.textContent=t;n.style.display="block";
+ setTimeout(()=>n.style.display="none",2200);
+}
+function checkout(){
+ if(!cart.length){notify("Sepetin boş.");return}
+ const lines=cart.map(p=>`${p.name} - Beden ${p.size} - ${money(p.price)}`).join("\n");
+ const message="Merhaba, sipariş vermek istiyorum:\n"+lines+"\nToplam: "+money(cart.reduce((s,p)=>s+p.price,0));
+ const url="https://wa.me/?text="+encodeURIComponent(message);
+ window.open(url,"_blank");
+}
+updateCart();
+</script>
+</body>
+</html>
+
